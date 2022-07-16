@@ -35,15 +35,15 @@ class RecursiveCall:
         self.kwargs = kwargs
         self.result: object | t.Literal[UNINITIALIZED] = UNINITIALIZED
 
-    def add_callee(self, callee: RecursiveCall):
+    def add_callee(self, callee: RecursiveCall) -> None:
         """Add a callee to the `callees` attribute, and register self as its caller."""
         self.callees.append(callee)
         callee.caller = self
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<RecursiveCall callees={self.callees} args={self.args} kwargs={self.kwargs} result={self.result})"
 
-    def pretty_print(self):
+    def pretty_print(self) -> None:
         """Pretty print this call."""
         current = self
         depth = 0
@@ -74,7 +74,7 @@ class RecursiveCall:
                 depth += 1
 
     @staticmethod
-    def _indent_from_depth(depth: int, *, hanging: bool = False):
+    def _indent_from_depth(depth: int, *, hanging: bool = False) -> str:
         """Get the spaces to indent for `depth`. If `hanging` is True, an additional indentation level is added."""
         if not depth:
             indent_width = 0
