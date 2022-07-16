@@ -1,4 +1,23 @@
 [[package]]
+name = "pyside6-essentials"
+version = "6.3.1"
+description = "Python bindings for the Qt cross-platform application and UI framework (Essentials)"
+category = "main"
+optional = false
+python-versions = "<3.11,>=3.6"
+
+[package.dependencies]
+shiboken6 = "6.3.1"
+
+[[package]]
+name = "shiboken6"
+version = "6.3.1"
+description = "Python/C++ bindings helper module"
+category = "main"
+optional = false
+python-versions = "<3.11,>=3.6"
+
+[[package]]
 name = "typing-extensions"
 version = "4.3.0"
 description = "Backported and Experimental Type Hints for Python 3.7+"
@@ -8,8 +27,10 @@ python-versions = ">=3.7"
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.7"
-content-hash = "1dc9c5e91c2c0ddb12c65f9be7e3c5f79e8be16589888a16ac49309cd0e9959a"
+python-versions = ">=3.7,<3.11"
+content-hash = "6ef1ae0e12dcb23054afd1c80cdb5ee75add0d706a64e96e4f04307fabcd891e"
 
 [metadata.files]
+pyside6-essentials = []
+shiboken6 = []
 typing-extensions = []
