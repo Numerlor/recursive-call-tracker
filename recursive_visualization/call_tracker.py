@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import enum
 import typing as t
 from collections import abc
@@ -22,16 +24,22 @@ class RecursiveCall:
     """
     A single recursive call.
 
-    Recursive calls from within this call should be added to `self.child_calls`.
+    Recursive calls from within this call should be registered with the `add_callee` method.
     """
-    def __init__(self, args: tuple[object, ...], kwargs: dict[str, object]):
-        self.child_calls = list[RecursiveCall]()
+    def __init__(self, args: tuple[object, ...], kwargs: dict[str, object], caller: None | RecursiveCall = None):
+        self.caller = caller
+        self.callees = list[RecursiveCall]()
         self.args = args
         self.kwargs = kwargs
         self.result: object | t.Literal[UNINITIALIZED] = UNINITIALIZED
 
+    def add_callee(self, callee: RecursiveCall):
+        """Add a callee to the `callees` attribute, and register self as its caller."""
+        self.callees.append(callee)
+        callee.caller = self
+
     def __repr__(self):
-        return f"<RecursiveCall child_calls={self.child_calls} args={self.args} kwargs={self.kwargs} result={self.result})"
+        return f"<RecursiveCall callees={self.callees} args={self.args} kwargs={self.kwargs} result={self.result})"
 
 
 class CallTracker:
@@ -51,7 +59,7 @@ class CallTracker:
             call = RecursiveCall(args, kwargs)
 
             if self._active_calls:
-                self._active_calls[-1].child_calls.append(call)
+                self._active_calls[-1].add_callee(call)
             else:
                 self.start_calls.append(call)
 
