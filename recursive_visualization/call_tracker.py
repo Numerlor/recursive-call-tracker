@@ -8,6 +8,8 @@ from functools import wraps
 P = t.ParamSpec("P")
 R = t.TypeVar("R")
 
+INDENT = 4
+
 
 class Uninitialized(enum.Enum):  # noqa: D101
     UNINITIALIZED = enum.auto()
@@ -40,6 +42,47 @@ class RecursiveCall:
 
     def __repr__(self):
         return f"<RecursiveCall callees={self.callees} args={self.args} kwargs={self.kwargs} result={self.result})"
+
+    def pretty_print(self):
+        """Pretty print this call."""
+        current = self
+        depth = 0
+        callee_iterators = {}
+
+        while current is not None:
+            if current not in callee_iterators:
+                callee_iterators[current] = iter(current.callees)
+                joined_kwargs = ", ".join(f"{name}={value!r}" for name, value in current.kwargs.items())
+                print(f"{self._indent_from_depth(depth,)}RecursiveCall")
+                hanging_indent = self._indent_from_depth(depth, hanging=True)
+                print(f"{hanging_indent}args={current.args!r}")
+                print(f"{hanging_indent}kwargs=dict({joined_kwargs})")
+                if not current.callees:
+                    print(f"{hanging_indent}callees=[]")
+                else:
+                    print(f"{hanging_indent}callees=[")
+
+            try:
+                current = next(callee_iterators[current])
+            except StopIteration:
+                if current.callees:
+                    print(f"{self._indent_from_depth(depth, hanging=True)}],")
+                depth -= 1
+                current = current.caller
+            else:
+                depth += 1
+
+    @staticmethod
+    def _indent_from_depth(depth: int, *, hanging: bool = False):
+        """Get the spaces to indent for `depth`. If `hanging` is True, an additional indentation level is added."""
+        if not depth:
+            indent_width = 0
+        else:
+            # Each depth has base indent + hanging from callees
+            indent_width = INDENT * depth * 2
+        if hanging:
+            indent_width += INDENT
+        return " " * indent_width
 
 
 class CallTracker:
