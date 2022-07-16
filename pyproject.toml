@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "recursive-visualization"
+version = "0.1.0"
+description = "Visualize recursive calls."
+authors = ["Numerlor <Numerlor@gmail.com>"]
+license = "GPL-3.0-or-later"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+
+[tool.poetry.dev-dependencies]
+typing-extensions = "4.3.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
