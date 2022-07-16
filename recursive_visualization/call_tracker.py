@@ -5,8 +5,10 @@ import typing as t
 from collections import abc
 from functools import wraps
 
-P = t.ParamSpec("P")
-R = t.TypeVar("R")
+if t.TYPE_CHECKING:
+    import typing_extensions as te
+    P = te.ParamSpec("P")
+    R = t.TypeVar("R")
 
 
 class Uninitialized(enum.Enum):  # noqa: D101
@@ -28,7 +30,7 @@ class RecursiveCall:
     """
     def __init__(self, args: tuple[object, ...], kwargs: dict[str, object], caller: None | RecursiveCall = None):
         self.caller = caller
-        self.callees = list[RecursiveCall]()
+        self.callees: list[RecursiveCall] = []
         self.args = args
         self.kwargs = kwargs
         self.result: object | t.Literal[UNINITIALIZED] = UNINITIALIZED
@@ -91,8 +93,8 @@ class CallTracker:
     The initial call for each recursive chain is stored in the `start_calls` attribute.
     """
     def __init__(self):
-        self._active_calls = list[RecursiveCall]()
-        self.start_calls = list[RecursiveCall]()
+        self._active_calls: list[RecursiveCall] = []
+        self.start_calls: list[RecursiveCall] = []
 
     def __call__(self, func: abc.Callable[P, R]) -> abc.Callable[P, R]:
 
