@@ -55,6 +55,7 @@ class RecursiveCall:
                 joined_kwargs = ", ".join(f"{name}={value!r}" for name, value in current.kwargs.items())
                 print(f"{self._indent_from_depth(depth,)}RecursiveCall")
                 hanging_indent = self._indent_from_depth(depth, hanging=True)
+                print(f"{hanging_indent}result={current.result!r}")
                 print(f"{hanging_indent}args={current.args!r}")
                 print(f"{hanging_indent}kwargs=dict({joined_kwargs})")
                 if not current.callees:
