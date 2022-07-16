@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import enum
+import threading
 import typing as t
-from collections import abc
+from collections import abc, defaultdict
 from functools import wraps
 
 if t.TYPE_CHECKING:
@@ -93,7 +94,7 @@ class CallTracker:
     The initial call for each recursive chain is stored in the `start_calls` attribute.
     """
     def __init__(self):
-        self._active_calls: list[RecursiveCall] = []
+        self._call_stacks: defaultdict[int, list[RecursiveCall]] = defaultdict(list)
         self.start_calls: list[RecursiveCall] = []
 
     def __call__(self, func: abc.Callable[P, R]) -> abc.Callable[P, R]:
@@ -101,17 +102,18 @@ class CallTracker:
         @wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
             call = RecursiveCall(args, kwargs)
+            call_stack = self._call_stacks[threading.get_ident()]
 
-            if self._active_calls:
-                self._active_calls[-1].add_callee(call)
+            if call_stack:
+                call_stack[-1].add_callee(call)
             else:
                 self.start_calls.append(call)
 
-            self._active_calls.append(call)
+            call_stack.append(call)
 
             result = func(*args, **kwargs)
 
-            self._active_calls.pop().result = result
+            call_stack.pop().result = result
 
             return result
 
