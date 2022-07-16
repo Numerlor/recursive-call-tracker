@@ -8,6 +8,7 @@ from functools import wraps
 
 if t.TYPE_CHECKING:
     import typing_extensions as te
+
     P = te.ParamSpec("P")
     R = t.TypeVar("R")
 
@@ -17,6 +18,7 @@ class Uninitialized(enum.Enum):  # noqa: D101
 
     def __str__(self):
         return self._name_
+
     __repr__ = __str__
 
 
@@ -29,7 +31,13 @@ class RecursiveCall:
 
     Recursive calls from within this call should be registered with the `add_callee` method.
     """
-    def __init__(self, args: tuple[object, ...], kwargs: dict[str, object], caller: None | RecursiveCall = None):
+
+    def __init__(
+        self,
+        args: tuple[object, ...],
+        kwargs: dict[str, object],
+        caller: None | RecursiveCall = None,
+    ):
         self.caller = caller
         self.callees: list[RecursiveCall] = []
         self.args = args
@@ -53,29 +61,37 @@ class RecursiveCall:
         while current is not None:
             if current not in callee_iterators:
                 callee_iterators[current] = iter(current.callees)
-                joined_kwargs = ", ".join(f"{name}={value!r}" for name, value in current.kwargs.items())
-                print(f"{self._indent_from_depth(depth, indent=indent)}RecursiveCall")
-                hanging_indent = self._indent_from_depth(depth, indent=indent, hanging=True)
-                print(f"{hanging_indent}result={current.result!r}")
-                print(f"{hanging_indent}args={current.args!r}")
-                print(f"{hanging_indent}kwargs=dict({joined_kwargs})")
+                joined_kwargs = ", ".join(
+                    f"{name}={value!r}" for name, value in current.kwargs.items()
+                )
+                print(  # noqa: T201
+                    f"{self._indent_from_depth(depth, indent=indent)}RecursiveCall"
+                )
+                hanging_indent = self._indent_from_depth(
+                    depth, indent=indent, hanging=True
+                )
+                print(f"{hanging_indent}result={current.result!r}")  # noqa: T201
+                print(f"{hanging_indent}args={current.args!r}")  # noqa: T201
+                print(f"{hanging_indent}kwargs=dict({joined_kwargs})")  # noqa: T201
                 if not current.callees:
-                    print(f"{hanging_indent}callees=[]")
+                    print(f"{hanging_indent}callees=[]")  # noqa: T201
                 else:
-                    print(f"{hanging_indent}callees=[")
+                    print(f"{hanging_indent}callees=[")  # noqa: T201
 
             try:
                 current = next(callee_iterators[current])
             except StopIteration:
                 if current.callees:
-                    print(f"{self._indent_from_depth(depth, indent=indent, hanging=True)}],")
+                    print(  # noqa: T201
+                        f"{self._indent_from_depth(depth, indent=indent, hanging=True)}],"
+                    )
                 depth -= 1
                 current = current.caller
             else:
                 depth += 1
 
     @staticmethod
-    def _indent_from_depth(depth: int, *, indent, hanging: bool = False) -> str:
+    def _indent_from_depth(depth: int, *, indent: int, hanging: bool = False) -> str:
         """Get the spaces to indent for `depth`. If `hanging` is True, an additional indentation level is added."""
         if not depth:
             indent_width = 0
@@ -93,11 +109,13 @@ class CallTracker:
 
     The initial call for each recursive chain is stored in the `start_calls` attribute.
     """
+
     def __init__(self):
         self._call_stacks: defaultdict[int, list[RecursiveCall]] = defaultdict(list)
         self.start_calls: list[RecursiveCall] = []
 
     def __call__(self, func: abc.Callable[P, R]) -> abc.Callable[P, R]:
+        """Wrap `func` to register calls to it in this tracker."""
 
         @wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
