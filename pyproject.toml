@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "recursive-visualization"
+name = "recursive-call-tracker"
 version = "0.1.0"
-description = "Visualize recursive calls."
+description = "Track and visualize recursive calls."
 authors = ["Numerlor <Numerlor@gmail.com>"]
 license = "GPL-3.0-or-later"
 
