@@ -1,3 +1,6 @@
+# This file is part of recursive-call-tracker. See __init__.py for more details.
+# Copyright (C) 2022  Numerlor
+
 from __future__ import annotations
 
 import enum
