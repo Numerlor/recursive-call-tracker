@@ -9,6 +9,8 @@ import typing as t
 from collections import abc, defaultdict
 from functools import wraps
 
+from recursive_call_tracker.utils import prettify_kwargs_repr
+
 if t.TYPE_CHECKING:
     import typing_extensions as te
 
@@ -64,9 +66,6 @@ class RecursiveCall:
         while current is not None:
             if current not in callee_iterators:
                 callee_iterators[current] = iter(current.callees)
-                joined_kwargs = ", ".join(
-                    f"{name}={value!r}" for name, value in current.kwargs.items()
-                )
                 print(  # noqa: T201
                     f"{self._indent_from_depth(depth, indent=indent)}RecursiveCall"
                 )
@@ -75,7 +74,9 @@ class RecursiveCall:
                 )
                 print(f"{hanging_indent}result={current.result!r}")  # noqa: T201
                 print(f"{hanging_indent}args={current.args!r}")  # noqa: T201
-                print(f"{hanging_indent}kwargs=dict({joined_kwargs})")  # noqa: T201
+                print(  # noqa: T201
+                    f"{hanging_indent}kwargs={prettify_kwargs_repr(current.kwargs)})"
+                )
                 if not current.callees:
                     print(f"{hanging_indent}callees=[]")  # noqa: T201
                 else:
